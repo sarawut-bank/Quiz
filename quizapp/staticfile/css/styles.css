@@ -1,0 +1,55 @@
+@import 'https://fonts.googleapis.com/css?family=Kanit|Prompt';
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Prompt', sans-serif;
+}
+
+:root {
+    --backgroundColor: #ffffff;
+    --colorTao: #1b1919;
+    --ColorWhite: #ffffff;
+    --ColorBlack: #000000;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+.fade-in {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+/*---------------------main----------------------*/
+main{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2% 0;
+}
+
+.inputData{
+    width: 30%;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 3px 3px 6px 3px #c5c5c5;
+}
+
+.date{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.first,
+.end{
+    width: 100%;
+}
+
+#date_first,
+#date_end{
+    width: 100%;
+}

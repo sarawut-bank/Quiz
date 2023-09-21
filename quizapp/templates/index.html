@@ -1,0 +1,108 @@
+{% extends "navbar.html" %}
+
+{% block link %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<link rel="stylesheet" href="{% static 'css/navstyles.css' %}">
+<title>QUIZ</title>
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="inputData">
+        <h2>ระบบขออนุญาตลาหยุด</h2>
+        <form action="" method="POST">
+            {% csrf_token %}
+            <div class="name">
+                <label>ชื่อ :</label>
+                <input class="form-control" name="name" type="text" required>
+                <label>นามสกุล :</label>
+                <input class="form-control" name="surename" type="text" required>
+            </div>
+            <div class="position">
+                <label>ตำแหน่ง :</label><br>
+                <input class="form-control" name="position" type="text" required>
+            </div>
+            <div class="email">
+                <label>อีเมล :</label><br>
+                <input class="form-control" name="email" type="text" required>
+            </div>
+            <div class="phone">
+                <label>เบอร์โทรศัพท์ :</label><br>
+                <input class="form-control" name="phone" type="text" required>
+            </div>
+            <div class="type">
+                <label>ประเภทการลา :</label><br>
+                <select class="form-select" id="type_leave" name="type_leave">
+                    <option value="ลาป่วย">ลาป่วย</option>
+                    <option value="ลากิจ">ลากิจ</option>
+                    <option value="พักร้อน">พักร้อน</option>
+                    <option value="อื่นๆ">อื่นๆ</option>
+                </select>
+            </div>
+            <div class="cause">
+                <label>สาเหตุการลา :</label><br>
+                <textarea class="form-control" name="cause" rows="10"></textarea>
+            </div>
+            <div class="date">
+                <div class="first">
+                    <label>วันที่ขอลา :</label><br>
+                    <input class="form-control" id="date_first" name="date_first" type="date" required>
+                </div>
+                <div class="end">
+                    <label>ถึงวันที่ :</label><br>
+                    <input class="form-control" id="date_end" name="date_end" type="date" required>
+                </div>
+            </div>
+            <button class="btn btn-primary" type="submit">บันทึกข้อมูล</button>
+        </form>
+    </div>
+</main>
+<script>
+    var dateInputFirst = document.getElementById('date_first');
+    var dateInputEnd = document.getElementById('date_end');
+    
+    dateInputFirst.min = new Date().toISOString().split('T')[0];
+    dateInputEnd.min = new Date().toISOString().split('T')[0];
+
+    var typeLeaveSelect = document.getElementById('type_leave');
+    var dateFirstInput = document.getElementById('date_first');
+    var dateEndInput = document.getElementById('date_end');
+
+    typeLeaveSelect.addEventListener('change', function () {
+        var selectedValue = typeLeaveSelect.value;
+
+        if (selectedValue === 'พักร้อน') {
+            dateFirstInput.disabled = false;
+            dateEndInput.disabled = false;
+
+            // สร้างวันที่ในอนาคต 3 วันจากวันปัจจุบัน
+            var currentDate = new Date();
+            currentDate.setDate(currentDate.getDate() + 3);
+            var maxDateString = currentDate.toISOString().split('T')[0];
+            dateEndInput.min = dateInputFirst.value; // ตั้งค่า min เป็นวันที่แรก
+            dateEndInput.max = maxDateString; // ตั้งค่า max เป็น 3 วันในอนาคต
+        } else {
+            dateFirstInput.disabled = false;
+            dateEndInput.disabled = false;
+        }
+    });
+
+    dateFirstInput.addEventListener('change', function () {
+        var selectedValue = typeLeaveSelect.value;
+
+        if (selectedValue === 'พักร้อน') {
+            var currentDate = new Date(dateFirstInput.value);
+            currentDate.setDate(currentDate.getDate() + 3);
+            var maxDateString = currentDate.toISOString().split('T')[0];
+            dateEndInput.min = dateFirstInput.value;
+            dateEndInput.max = maxDateString;
+        }
+    });
+</script>
+
+
+
+
+
+{% endblock %}

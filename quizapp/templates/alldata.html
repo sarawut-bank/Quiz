@@ -1,0 +1,198 @@
+{% extends "navbar.html" %}
+
+{% block link %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/alldatastyle.css' %}">
+<link rel="stylesheet" href="{% static 'css/navstyles.css' %}">
+<!-- <script src="{% static 'js/scripts.js' %}"></script> -->
+<title>QUIZ</title>
+{% endblock %}
+
+{% block content %}
+<main>
+    <h2>รายการขอลาหยุด</h2>
+    <div class="top">
+        <div class="search">
+            <input class="form-control" type="text" id="searchInput" placeholder="ค้นหาตามชื่อ, นามสกุล, หรือวันที่ขอลา">
+            <button class="btn btn-success" onclick="searchTable()">ค้นหา</button>
+        </div>
+        <div class="table-controls">
+            <button class="btn btn-dark" id="sort-button" onclick="toggleSortDirection()">เรียงลำดับ: ล่าสุดไปเก่าสุด</button>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <th>ชื่อ</th>
+            <th>นามสกุล</th>
+            <th>ตำแหน่ง</th>
+            <th>อีเมล</th>
+            <th>เบอร์โทรศัพท์</th>
+            <th>ประเภทการลา</th>
+            <th>สาเหตุการลา</th>
+            <th>วันที่ขอลา</th>
+            <th>ถึงวันที่</th>
+            <th>วันเวลาที่บันทึกข้อมูล</th>
+            <th>สถานะ</th>
+            <th>การดำเนินการ</th>
+        </thead>
+        <tbody>
+            {% for alldata in data %}
+            <tr>
+                <td>{{ alldata.name }}</td>
+                <td>{{ alldata.surename }}</td>
+                <td>{{ alldata.position }}</td>
+                <td>{{ alldata.email }}</td>
+                <td>{{ alldata.phone }}</td>
+                <td>{{ alldata.type_leave }}</td>
+                <td>{{ alldata.cause }}</td>
+                <td>{{ alldata.date_first }}</td>
+                <td>{{ alldata.date_end }}</td>
+                <td>{{ alldata.date_save }}</td>
+                <td>{{ alldata.status }}</td>
+                <td><button class="btn btn-danger delete-button" data-id="{{ alldata.id }}">ลบ</button>
+                    <button class="btn btn-success" id="approve-button" data-id="{{ alldata.id }}">อนุมัติ</button>
+                    <button class="btn btn-secondary" id="reject-button" data-id="{{ alldata.id }}">ไม่อนุมัติ</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</main>
+<script>
+    function searchTable() {
+        var input = document.getElementById('searchInput').value.toUpperCase();
+        var table = document.querySelector('table');
+        var rows = table.querySelectorAll('tbody tr');
+
+        for (var i = 0; i < rows.length; i++) {
+
+            var nameColumn = rows[i].querySelector('td:nth-child(1)').textContent.toUpperCase();
+            var surenameColumn = rows[i].querySelector('td:nth-child(2)').textContent.toUpperCase();
+            var dateFirstColumn = rows[i].querySelector('td:nth-child(8)').textContent.toUpperCase();
+
+            if (nameColumn.indexOf(input) > -1 || surenameColumn.indexOf(input) > -1 || dateFirstColumn.indexOf(input) > -1) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none'; 
+            }
+        }
+    }
+
+    var sortDirection = 'desc'; 
+    function toggleSortDirection() {
+        sortDirection = sortDirection === 'desc' ? 'asc' : 'desc';
+        sortTable();
+    }
+
+    function sortTable() {
+        var table = document.querySelector('table');
+        var tbody = table.querySelector('tbody');
+        var rows = Array.from(tbody.querySelectorAll('tr'));
+
+        rows.sort(function (a, b) {
+            var textA = a.querySelector('td:nth-child(10)').textContent.toUpperCase(); // คอลัมน์วันที่ขอลา
+            var textB = b.querySelector('td:nth-child(10)').textContent.toUpperCase();
+
+            if (sortDirection === 'asc') {
+                return textA.localeCompare(textB);
+            } else {
+                return textB.localeCompare(textA);
+            }
+        });
+
+        while (tbody.firstChild) {
+            tbody.removeChild(tbody.firstChild);
+        }
+
+        rows.forEach(function (row) {
+            tbody.appendChild(row);
+        });
+
+        var sortButton = document.getElementById('sort-button');
+        sortButton.textContent = 'เรียงลำดับ: ' + (sortDirection === 'desc' ? 'ล่าสุดไปเก่าสุด' : 'เก่าสุดไปล่าสุด');
+    }
+
+    var approveButtons = document.querySelectorAll("#approve-button");
+    var rejectButtons = document.querySelectorAll("#reject-button");
+
+    approveButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            var dataId = button.getAttribute("data-id");
+            fetch("/approve_status/" + dataId, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken"),
+                },
+            })
+                .then(function (response) {
+                    if (response.ok) {
+                        alert("อนุมัติสำเร็จ");
+                    } else {
+                        alert("เกิดข้อผิดพลาดในการอนุมัติ");
+                    }
+                });
+        });
+    });
+
+    rejectButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            var dataId = button.getAttribute("data-id");
+            fetch("/reject_status/" + dataId, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken"),
+                },
+            })
+                .then(function (response) {
+                    if (response.ok) {
+                        alert("ไม่อนุมัติสำเร็จ");
+                    } else {
+                        alert("เกิดข้อผิดพลาดในการไม่อนุมัติ");
+                    }
+                });
+        });
+    });
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            var cookies = document.cookie.split(";");
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+<script>
+
+    $(document).on('click', '.delete-button', function() {
+        var rowId = $(this).closest('tr').data('id');
+        var confirmation = confirm("คุณแน่ใจหรือไม่ที่ต้องการลบข้อมูลนี้?");
+        
+        if (confirmation) {
+
+            $('tr[data-id="' + rowId + '"]').hide();
+
+            $.ajax({
+                url: '/delete', 
+                type: 'POST',
+                data: { id: rowId },
+                success: function(response) {
+
+                },
+                error: function(error) {
+                    console.error('เกิดข้อผิดพลาดในการลบข้อมูล: ' + error);
+                }
+            });
+        }
+    });
+</script>
+
+{% endblock %}

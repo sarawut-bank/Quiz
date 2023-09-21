@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include 'head.html' %}
+<head>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/navstyles.css' %}">
+    {% block link %}
+    {% endblock %}
+</head>
+<body>
+    <nav>
+        <div class="header">
+            <b>Quiz</b>
+        </div>
+        <div class="menu-icon">
+            <span class="fas fa-bars"></span>
+        </div>
+        <div class="nav-items">
+            <li><a href="index">เพิ่มข้อมูล</a></li>
+            <li><a href="alldata">รายการขอลาหยุด</a></li>
+        </div>
+        <div class="cancel-icon">
+            <span class="fas fa-times"></span>
+        </div>
+        <div class="profile-icon" hidden>
+            <a href="#">
+                <img src="" width="40" height="40">
+            </a>
+        </div>
+    </nav>
+    {% block content %}
+    {% endblock %}
+    <script>
+        const menuBtn = document.querySelector(".menu-icon span");
+        const profileBtn = document.querySelector(".profile-icon");
+        const cancelBtn = document.querySelector(".cancel-icon");
+        const items = document.querySelector(".nav-items");
+        var mapBox = document.querySelector(".mapBox");
+    
+        menuBtn.onclick = () => {
+            items.classList.add("active");
+            menuBtn.classList.add("hide");
+            profileBtn.classList.add("hide");
+            cancelBtn.classList.add("show");
+            mapBox.style.display = 'none';
+        }
+        cancelBtn.onclick = () => {
+            items.classList.remove("active");
+            menuBtn.classList.remove("hide");
+            profileBtn.classList.remove("hide");
+            cancelBtn.classList.remove("show");
+            form.classList.remove("active");
+            cancelBtn.style.color = "#ff3d00";
+            mapBox.style.display = 'block';
+        }
+        items.onclick = () => {
+            items.classList.remove("active");
+            menuBtn.classList.remove("hide");
+            profileBtn.classList.remove("hide");
+            cancelBtn.classList.remove("show");
+            form.classList.remove("active");
+            mapBox.style.display = 'block';
+        }
+    
+    </script>
+</body>
+</html>
